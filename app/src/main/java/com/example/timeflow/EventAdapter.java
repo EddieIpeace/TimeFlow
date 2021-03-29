@@ -1,5 +1,6 @@
 package com.example.timeflow;
 
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,9 +44,38 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = mEventList.get(position);
-        holder.eventId.setText("" + event.getId());
-        holder.eventBeginTs.setText("" + event.getBegin_ts());
-        holder.eventEndTs.setText("" + event.getEnd_ts());
+        long duration = (event.getEnd_ts() - event.getBegin_ts()) / 60000;
+        if (duration < 10) {
+            holder.eventId.setBackgroundResource(R.color.dodgerblue);
+            holder.eventBeginTs.setBackgroundResource(R.color.dodgerblue);
+            holder.eventEndTs.setBackgroundResource(R.color.dodgerblue);
+            holder.eventDesc.setBackgroundResource(R.color.dodgerblue);
+            holder.eventId.setHeight(100);
+            holder.eventBeginTs.setHeight(100);
+            holder.eventEndTs.setHeight(100);
+            holder.eventDesc.setHeight(100);
+        } else if (duration < 30) {
+            holder.eventId.setBackgroundResource(R.color.green);
+            holder.eventBeginTs.setBackgroundResource(R.color.green);
+            holder.eventEndTs.setBackgroundResource(R.color.green);
+            holder.eventDesc.setBackgroundResource(R.color.green);
+            holder.eventId.setHeight(200);
+            holder.eventBeginTs.setHeight(200);
+            holder.eventEndTs.setHeight(200);
+            holder.eventDesc.setHeight(200);
+        } else {
+            holder.eventId.setBackgroundResource(R.color.red);
+            holder.eventBeginTs.setBackgroundResource(R.color.red);
+            holder.eventEndTs.setBackgroundResource(R.color.red);
+            holder.eventDesc.setBackgroundResource(R.color.red);
+            holder.eventId.setHeight(300);
+            holder.eventBeginTs.setHeight(300);
+            holder.eventEndTs.setHeight(300);
+            holder.eventDesc.setHeight(300);
+        }
+        holder.eventId.setText("" + duration);
+        holder.eventBeginTs.setText(Tool.dateToString(event.getBegin_ts(), "HH:mm"));
+        holder.eventEndTs.setText(Tool.dateToString(event.getEnd_ts(), "HH:mm"));
         holder.eventDesc.setText(event.getDesc());
     }
 

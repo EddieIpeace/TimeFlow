@@ -32,8 +32,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,11 +45,19 @@ public class MainActivity extends AppCompatActivity {
     private Button time_click;
     private EditText write_sth;
     private RecyclerView event_list;
+    private TextView today_day;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        today_day = (TextView) findViewById(R.id.today_day);
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String today_str = format.format(calendar.getTime());
+        today_str = "  " + today_str;
+        today_day.setText(today_str);
 
         event_list = (RecyclerView) findViewById(R.id.recycler_view);
         write_sth = (EditText)  findViewById(R.id.write_sth);
@@ -55,7 +66,10 @@ public class MainActivity extends AppCompatActivity {
         time_click.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                long now_ts = new Date().getTime();
+                if (write_sth.getText().toString().equals("") && !simple_data.isStart()) {
+                    Toast.makeText(MainActivity.this, "描述不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 addEvent();
                 updateButtonText();
             }
@@ -74,7 +88,13 @@ public class MainActivity extends AppCompatActivity {
     private void showEventList() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         event_list.setLayoutManager(layoutManager);
-        List<Event> events = DataSupport.findAll(Event.class);
+        long start_ts = Tool.getTodayStartTime().getTime();
+        long end_ts = Tool.getTodayEndTime().getTime();
+        Log.e(TAG, "showEventList: start:" + start_ts + " end:" + end_ts);
+        List<Event> events = DataSupport.where("begin_ts >= ? and begin_ts <= ?", "" + start_ts, "" + end_ts).find(Event.class);
+        if (0 == events.size()) {
+            return;
+        }
         EventAdapter adapter = new EventAdapter(events);
         event_list.setAdapter(adapter);
         event_list.smoothScrollToPosition(events.size() - 1);
