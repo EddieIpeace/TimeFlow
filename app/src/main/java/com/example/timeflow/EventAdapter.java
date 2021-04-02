@@ -1,6 +1,7 @@
 package com.example.timeflow;
 
 import android.text.Layout;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             eventEndTs = (TextView) view.findViewById(R.id.event_end_ts);
             eventDesc = (TextView) view.findViewById(R.id.event_desc);
         }
+
+        public void setEventItemProps(int color, int height) {
+            eventId.setBackgroundResource(color);
+            eventBeginTs.setBackgroundResource(color);
+            eventEndTs.setBackgroundResource(color);
+            eventDesc.setBackgroundResource(color);
+            eventId.setHeight(height);
+            eventBeginTs.setHeight(height);
+            eventEndTs.setHeight(height);
+            eventDesc.setHeight(height);
+        }
     }
 
     public EventAdapter(List<Event> eventList) {
@@ -45,33 +57,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = mEventList.get(position);
         long duration = (event.getEnd_ts() - event.getBegin_ts()) / 60000;
+        if (event.getEnd_ts() == 0) {
+            duration = 0;
+        }
         if (duration < 10) {
-            holder.eventId.setBackgroundResource(R.color.dodgerblue);
-            holder.eventBeginTs.setBackgroundResource(R.color.dodgerblue);
-            holder.eventEndTs.setBackgroundResource(R.color.dodgerblue);
-            holder.eventDesc.setBackgroundResource(R.color.dodgerblue);
-            holder.eventId.setHeight(100);
-            holder.eventBeginTs.setHeight(100);
-            holder.eventEndTs.setHeight(100);
-            holder.eventDesc.setHeight(100);
+            holder.setEventItemProps(R.color.dodgerblue, 100);
         } else if (duration < 30) {
-            holder.eventId.setBackgroundResource(R.color.green);
-            holder.eventBeginTs.setBackgroundResource(R.color.green);
-            holder.eventEndTs.setBackgroundResource(R.color.green);
-            holder.eventDesc.setBackgroundResource(R.color.green);
-            holder.eventId.setHeight(200);
-            holder.eventBeginTs.setHeight(200);
-            holder.eventEndTs.setHeight(200);
-            holder.eventDesc.setHeight(200);
+            holder.setEventItemProps(R.color.green, 200);
         } else {
-            holder.eventId.setBackgroundResource(R.color.red);
-            holder.eventBeginTs.setBackgroundResource(R.color.red);
-            holder.eventEndTs.setBackgroundResource(R.color.red);
-            holder.eventDesc.setBackgroundResource(R.color.red);
-            holder.eventId.setHeight(300);
-            holder.eventBeginTs.setHeight(300);
-            holder.eventEndTs.setHeight(300);
-            holder.eventDesc.setHeight(300);
+            holder.setEventItemProps(R.color.red, 300);
         }
         holder.eventId.setText("" + duration);
         holder.eventBeginTs.setText(Tool.dateToString(event.getBegin_ts(), "HH:mm"));
@@ -83,4 +77,5 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     public int getItemCount() {
         return mEventList.size();
     }
+
 }

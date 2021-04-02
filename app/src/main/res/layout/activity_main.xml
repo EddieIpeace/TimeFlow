@@ -21,13 +21,27 @@
     <EditText
         android:id="@+id/write_sth"
         android:hint="something todo"
+        android:textSize="30dp"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"/>
+        android:layout_weight="1"/>
     <Button
         android:id="@+id/time_click"
-        android:text="click me"
+        android:textSize="30dp"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"/>
+        android:layout_weight="1"/>
+    <Button
+        android:id="@+id/goto_reminder"
+        android:text="备忘录"
+        android:textSize="30dp"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 </LinearLayout>

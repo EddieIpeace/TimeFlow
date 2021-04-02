@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -21,22 +22,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import org.litepal.crud.DataSupport;
 import org.litepal.tablemanager.Connector;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,23 +38,52 @@ public class MainActivity extends AppCompatActivity {
     private EditText write_sth;
     private RecyclerView event_list;
     private TextView today_day;
+    private Button goto_reminder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // todo, 创建数据库，以后优化这一步
+        Connector.getDatabase();
+
         today_day = (TextView) findViewById(R.id.today_day);
+        event_list = (RecyclerView) findViewById(R.id.recycler_view);
+        write_sth = (EditText)  findViewById(R.id.write_sth);
+        simple_data = new SimpleData(getSharedPreferences("main_data", MODE_PRIVATE));
+        time_click = (Button) findViewById(R.id.time_click);
+        goto_reminder = (Button) findViewById(R.id.goto_reminder);
+        initGotoReminder();
+        initTodayDay();
+        initTimeClick();
+        updateButtonText();
+        showEventList();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    private void initGotoReminder() {
+        goto_reminder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, ReminderActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void initTodayDay() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String today_str = format.format(calendar.getTime());
         today_str = "  " + today_str;
         today_day.setText(today_str);
-
-        event_list = (RecyclerView) findViewById(R.id.recycler_view);
-        write_sth = (EditText)  findViewById(R.id.write_sth);
-        simple_data = new SimpleData(getSharedPreferences("main_data", MODE_PRIVATE));
-        time_click = (Button) findViewById(R.id.time_click);
+    }
+    private void initTimeClick() {
         time_click.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,23 +95,13 @@ public class MainActivity extends AppCompatActivity {
                 updateButtonText();
             }
         });
-        updateButtonText();
-        Connector.getDatabase();
-        showEventList();
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
 
     private void showEventList() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         event_list.setLayoutManager(layoutManager);
         long start_ts = Tool.getTodayStartTime().getTime();
         long end_ts = Tool.getTodayEndTime().getTime();
-        Log.e(TAG, "showEventList: start:" + start_ts + " end:" + end_ts);
         List<Event> events = DataSupport.where("begin_ts >= ? and begin_ts <= ?", "" + start_ts, "" + end_ts).find(Event.class);
         if (0 == events.size()) {
             return;
